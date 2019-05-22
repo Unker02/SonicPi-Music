@@ -1,0 +1,59 @@
+live_loop :drums do
+  name = [:drum_heavy_kick, :drum_snare_hard].ring
+  sequence = [0,1,1,0,0,1].ring
+  timings = [1,0.75,0.25,0.5,0.5,1].ring
+  sample name[sequence.tick]
+  sleep timings.look
+end
+
+live_loop :main do
+  notes = [chord(:eb3, :major), chord(:d3, :minor)].ring
+  sequence = [0,1,2,1,0,1,2,0].ring
+  cnt = look(offset:1) / sequence.count
+  play notes[cnt][sequence.tick]
+  sleep 0.5
+end
+
+with_fx :reverb, mix: 0.5, room: 0.95 do
+  define :melody do
+    9.times do
+      sequence = [2,3,8,7,6,5,6,7,6].ring
+      timings = [0.75,0.75,1,1,0.25,0.25,0.25,0.25,3.5].ring
+      play scale(:Bb4, :major, num_octaves:3)[sequence.tick]
+      sleep timings.look
+    end
+  end
+  
+  define :random do
+    cnt = 0
+    timings = [0.25, 0.5]
+    while cnt < 32 - timings.max do
+        play choose(scale(:Bb4, :major_pentatonic))
+        time = choose(timings)
+        cnt += time
+        sleep time
+      end
+      cnt = 8 - cnt % 8
+      sleep cnt
+    end
+    
+    live_loop :piano do
+      use_synth :piano
+      4.times do
+        melody
+      end
+      random
+    end
+  end
+  
+  with_fx :flanger, phase: 0.5 do
+    live_loop :ambient do
+      use_synth :sine
+      s = play :Bb2, sustain: 8, release: 0, amp: 0.5, note_slide: 0.25
+      sleep 3.25
+      control s, note: :C4
+      sleep 0.75
+      control s, note: :F3
+      sleep 4
+    end
+  end  
