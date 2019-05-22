@@ -28,32 +28,34 @@ with_fx :reverb, mix: 0.5, room: 0.95 do
     cnt = 0
     timings = [0.25, 0.5]
     while cnt < 32 - timings.max do
-        play choose(scale(:Bb4, :major_pentatonic))
-        time = choose(timings)
-        cnt += time
-        sleep time
-      end
-      cnt = 8 - cnt % 8
-      sleep cnt
+      play choose(scale(:Bb4, :major_pentatonic))
+      time = choose(timings)
+      cnt += time
+      sleep time
     end
-    
-    live_loop :piano do
-      use_synth :piano
-      4.times do
-        melody
-      end
-      random
-    end
+    cnt = 8 - cnt % 8
+    sleep cnt
   end
-  
-  with_fx :flanger, phase: 0.5 do
-    live_loop :ambient do
-      use_synth :sine
-      s = play :Bb2, sustain: 8, release: 0, amp: 0.5, note_slide: 0.25
-      sleep 3.25
-      control s, note: :C4
-      sleep 0.75
-      control s, note: :F3
-      sleep 4
+    
+  live_loop :piano do
+    use_synth :piano
+    4.times do
+      melody
     end
-  end  
+    random
+  end
+end
+  
+with_fx :flanger, phase: 0.5 do
+  live_loop :ambient do
+    use_synth :sine
+    s = play :Bb2, sustain: 8, release: 0, amp: 0.5, note_slide: 0.25
+    sleep 3.25
+    control s, note: :C4
+    sleep 0.75
+    control s, note: :F3
+    sleep 3.5
+    control s, note: :Bb2
+    sleep 0.5
+  end
+end
